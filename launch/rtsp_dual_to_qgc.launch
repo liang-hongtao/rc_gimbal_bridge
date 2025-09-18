@@ -1,0 +1,26 @@
+<launch>
+  <!-- 输入两路 RTSP 源（默认与你目前设置一致） -->
+  <arg name="rgb_url" default="rtsp://192.168.144.108:554/stream=1"/>
+  <arg name="thermal_url" default="rtsp://192.168.144.108:555/stream=2"/>
+
+  <!-- 取流相关通用参数（保持与 ffplay 一致，TCP + 低时延） -->
+  <arg name="backend" default="ffmpeg"/>
+  <arg name="rtsp_transport" default="tcp"/>
+  <arg name="timeout_ms" default="5000"/>
+  <arg name="ffmpeg_low_latency" default="true"/>
+  <arg name="ffmpeg_capture_options" default=""/>
+
+  <!-- 1) 拉起双路 RTSP->ROS 图像话题发布（/rgb/* 与 /thermal/*） -->
+  <include file="$(find rc_gimbal_bridge)/launch/rtsp_dual_camera_relay.launch">
+    <arg name="rgb_url" value="$(arg rgb_url)"/>
+    <arg name="thermal_url" value="$(arg thermal_url)"/>
+    <arg name="backend" value="$(arg backend)"/>
+    <arg name="rtsp_transport" value="$(arg rtsp_transport)"/>
+    <arg name="timeout_ms" value="$(arg timeout_ms)"/>
+    <arg name="ffmpeg_low_latency" value="$(arg ffmpeg_low_latency)"/>
+    <arg name="ffmpeg_capture_options" value="$(arg ffmpeg_capture_options)"/>
+  </include>
+
+  <!-- 2) 启动本包自带的 RTSP 服务（从 /rgb 与 /thermal 话题推流到 8554 端口） -->
+  <include file="$(find rc_gimbal_bridge)/launch/rtsp_topics_server.launch"/>
+</launch>

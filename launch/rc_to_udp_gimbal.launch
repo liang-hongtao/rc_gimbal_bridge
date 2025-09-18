@@ -1,0 +1,42 @@
+<launch>
+  <node pkg="rc_gimbal_bridge" type="rc_to_udp_gimbal.py" name="rc_to_udp_gimbal" output="screen">
+    <param name="camera_ip" value="192.168.144.108"/>
+    <param name="port" value="5000"/>
+    <!-- 左拨轮=CH9 控偏航，右拨轮=CH10 控俯仰 -->
+    <param name="ch_yaw" value="9"/>
+    <param name="ch_pitch" value="10"/>
+
+    <!-- RC端点与中心/死区（单位us）；中心±deadband内不动 -->
+    <param name="pwm_min_yaw" value="1050"/>
+    <param name="pwm_max_yaw" value="1950"/>
+    <param name="center_yaw" value="1500"/>
+    <param name="deadband_yaw" value="80"/>
+
+    <param name="pwm_min_pitch" value="1050"/>
+    <param name="pwm_max_pitch" value="1950"/>
+    <param name="center_pitch" value="1500"/>
+    <param name="deadband_pitch" value="80"/>
+
+    <!-- 速度限制与频率 -->
+    <param name="max_yaw" value="100"/>
+    <param name="max_pitch" value="100"/>
+    <param name="repeat_hz" value="15"/>
+
+    <!-- 模式选择：deadband_speed / speed / position -->
+    <param name="control_mode" value="deadband_speed"/>
+
+    <!-- 位置模式备用参数（如切换到position才生效） -->
+    <param name="yaw_min_deg" value="-90"/>
+    <param name="yaw_max_deg" value="90"/>
+    <param name="pitch_min_deg" value="-30"/>
+    <param name="pitch_max_deg" value="30"/>
+    <param name="kp_yaw" value="1.0"/>
+    <param name="kp_pitch" value="1.0"/>
+    <param name="speed_scale_yaw" value="0.8"/>
+    <param name="speed_scale_pitch" value="0.8"/>
+
+    <!-- 方向反转开关（如方向相反设为true） -->
+    <rosparam param="invert_yaw">false</rosparam>
+    <rosparam param="invert_pitch">true</rosparam>
+  </node>
+</launch>

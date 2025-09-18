@@ -1,0 +1,49 @@
+<launch>
+  <!-- 集成：RC→UDP 云台控制 + 双路 RTSP→ROS 图像话题（rgb/thermal） -->
+
+  <!-- C) PX4/MAVROS 启动（robot_bringup/px4.launch） -->
+  <include file="$(find robot_bringup)/launch/px4.launch"/>
+
+  <!-- RTSP 两路源（如需修改可在启动命令覆盖） -->
+  <arg name="rgb_url" default="rtsp://192.168.144.108:554/stream=1"/>
+  <arg name="thermal_url" default="rtsp://192.168.144.108:555/stream=2"/>
+
+  <!-- 通用取流参数（保持低时延与 TCP） -->
+  <arg name="backend" default="ffmpeg"/>
+  <arg name="rtsp_transport" default="tcp"/>
+  <arg name="timeout_ms" default="5000"/>
+  <arg name="ffmpeg_low_latency" default="true"/>
+  <arg name="ffmpeg_capture_options" default=""/>
+
+  <!-- A) 双路 RTSP → ROS 话题（/rgb/* 与 /thermal/*） -->
+  <include file="$(find rc_gimbal_bridge)/launch/rtsp_dual_camera_relay.launch">
+    <arg name="rgb_url" value="$(arg rgb_url)"/>
+    <arg name="thermal_url" value="$(arg thermal_url)"/>
+    <arg name="backend" value="$(arg backend)"/>
+    <arg name="rtsp_transport" value="$(arg rtsp_transport)"/>
+    <arg name="timeout_ms" value="$(arg timeout_ms)"/>
+    <arg name="ffmpeg_low_latency" value="$(arg ffmpeg_low_latency)"/>
+    <arg name="ffmpeg_capture_options" value="$(arg ffmpeg_capture_options)"/>
+  </include>
+
+  <!-- 选择是否使用 GUI/控制台 键盘控制（默认开启 GUI） -->
+  <arg name="use_keyboard_gui" default="true"/>
+  <arg name="use_keyboard_console" default="false"/>
+
+  <!-- B) RC → UDP 云台控制（使用默认参数；需改 IP 时直接编辑对应 launch 或另行覆盖） -->
+  <include file="$(find rc_gimbal_bridge)/launch/rc_to_udp_gimbal.launch"/>
+
+  <!-- C1) GUI 键盘控制（Tk 窗口，默认启用） -->
+  <group if="$(arg use_keyboard_gui)">
+    <node pkg="rc_gimbal_bridge" type="gimbal_keyboard_gui.py" name="gimbal_keyboard_gui" output="screen">
+      <param name="camera_ip" value="192.168.144.108"/>
+      <param name="port" value="5000"/>
+    </node>
+  </group>
+
+  <!-- C2) 控制台键盘（如需以终端窗口捕获按键，建议用 xterm） -->
+  <group if="$(arg use_keyboard_console)">
+    <node pkg="rc_gimbal_bridge" type="realtime_control_v2.py" name="gimbal_keyboard_cli" output="screen" launch-prefix="xterm -e"/>
+  </group>
+
+</launch>

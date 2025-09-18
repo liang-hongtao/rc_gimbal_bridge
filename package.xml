@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>rc_gimbal_bridge</name>
+  <version>0.0.1</version>
+  <description>Map RC channels to UDP gimbal control</description>
+  <maintainer email="you@example.com">you</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+  <depend>mavros_msgs</depend>
+  <depend>roscpp</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+
+  <!-- 运行时依赖（Python GI + GStreamer RTSP Server）。若 rosdep 无法解析，可手动使用 apt 安装：
+       sudo apt-get install -y python3-gi gir1.2-gst-rtsp-server-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-libav -->
+  <exec_depend>python3-gi</exec_depend>
+  <exec_depend>gir1.2-gst-rtsp-server-1.0</exec_depend>
+</package>

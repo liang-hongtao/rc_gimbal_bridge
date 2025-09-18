@@ -1,0 +1,13 @@
+port: 8554
+streams:
+  rgb:
+    topic: /rgb/image
+    mountpoint: /rgb
+    framerate: 20
+    bitrate: 1500
+  thermal:
+    topic: /thermal/image
+    mountpoint: /thermal
+    framerate: 20
+    bitrate: 1200
+

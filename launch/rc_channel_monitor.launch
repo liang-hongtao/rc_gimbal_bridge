@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="rc_gimbal_bridge" type="rc_channel_monitor.py" name="rc_channel_monitor" output="screen">
+    <param name="change_thresh" value="25"/>
+    <param name="print_every" value="0.5"/>
+    <param name="show_all" value="false"/>
+  </node>
+</launch>
+

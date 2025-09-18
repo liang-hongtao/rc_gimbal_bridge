@@ -1,0 +1,7 @@
+<launch>
+  <!-- 本地 RTSP 服务器：将两路 ROS 图像推为 rtsp://<IP>:8554/{rgb,thermal} -->
+  <node pkg="rc_gimbal_bridge" type="rtsp_image_server.py" name="rtsp_image_server" output="screen">
+    <!-- 将配置加载到节点私有命名空间，便于脚本读取 ~streams/~port -->
+    <rosparam file="$(find rc_gimbal_bridge)/config/rtsp_topics.yaml" command="load"/>
+  </node>
+</launch>

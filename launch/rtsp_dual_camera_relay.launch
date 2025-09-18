@@ -1,0 +1,47 @@
+<launch>
+  <!-- Stream URLs -->
+  <arg name="rgb_url" default="rtsp://192.168.144.108:554/stream=1"/>
+  <arg name="thermal_url" default="rtsp://192.168.144.108:555/stream=2"/>
+
+  <!-- Common tuning -->
+  <arg name="backend" default="ffmpeg"/>
+  <arg name="rtsp_transport" default="tcp"/>
+  <arg name="timeout_ms" default="5000"/>
+  <arg name="ffmpeg_low_latency" default="true"/>
+  <arg name="ffmpeg_capture_options" default=""/>
+
+  <!-- RGB stream -->
+  <group ns="rgb">
+    <node pkg="rc_gimbal_bridge" name="rtsp_camera_relay" type="rtsp_camera_relay_node" output="screen">
+      <param name="video_stream_url" value="$(arg rgb_url)"/>
+      <param name="backend" value="$(arg backend)"/>
+      <param name="rtsp_transport" value="$(arg rtsp_transport)"/>
+      <param name="timeout_ms" value="$(arg timeout_ms)"/>
+      <param name="ffmpeg_low_latency" value="$(arg ffmpeg_low_latency)"/>
+      <param name="ffmpeg_capture_options" value="$(arg ffmpeg_capture_options)"/>
+
+      <!-- Flatten private topics to /rgb/... -->
+      <remap from="~image" to="image"/>
+      <remap from="~camera_info" to="camera_info"/>
+      <remap from="~status" to="status"/>
+    </node>
+  </group>
+
+  <!-- Thermal/IR stream -->
+  <group ns="thermal">
+    <node pkg="rc_gimbal_bridge" name="rtsp_camera_relay" type="rtsp_camera_relay_node" output="screen">
+      <param name="video_stream_url" value="$(arg thermal_url)"/>
+      <param name="backend" value="$(arg backend)"/>
+      <param name="rtsp_transport" value="$(arg rtsp_transport)"/>
+      <param name="timeout_ms" value="$(arg timeout_ms)"/>
+      <param name="ffmpeg_low_latency" value="$(arg ffmpeg_low_latency)"/>
+      <param name="ffmpeg_capture_options" value="$(arg ffmpeg_capture_options)"/>
+
+      <!-- Flatten private topics to /thermal/... -->
+      <remap from="~image" to="image"/>
+      <remap from="~camera_info" to="camera_info"/>
+      <remap from="~status" to="status"/>
+    </node>
+  </group>
+</launch>
+
