@@ -35,6 +35,31 @@
 
 提示：若使用本包内置 RTSP 服务（rtsp_dual_to_qgc.launch / rtsp_topics_server.launch），需要系统安装 GStreamer 运行期组件与 Python GI，详见下文依赖。
 
+## 概述
+
+rc_gimbal_bridge 是一个“摄像与云台桥接”工具包，旨在把外部 RTSP 摄像头与机载云台控制无缝接入 ROS，并把 ROS 图像再推成 RTSP 供 QGC/地面站/播放器观看。其目标是：
+- 快速将可见光/热成像双路 RTSP 流接入 ROS 并发布标准图像话题。
+- 将任意 ROS 图像话题以单端口多路径的 RTSP 形式对外输出（便于 QGC/VLC 直接取流）。
+- 通过 MAVROS 读取 RC 通道，将拨轮/摇杆映射为云台偏航/俯仰速度命令，并支持键盘辅助控制与回中、变倍等常用操作。
+- 提供低延迟、稳定的默认参数，并可结合网络与负载做细化调优。
+
+关键特性：
+- RTSP→ROS：基于 OpenCV（首选 FFmpeg 后端）拉流，支持 TCP/UDP 传输、超时与低时延选项。
+- ROS→RTSP：内置 GStreamer RTSP Server，单端口多路挂载（/rgb、/thermal 等），默认 H.264（x264）编码。
+- 云台控制：RC→UDP 协议映射（偏航/俯仰/变倍），叠加 GUI/控制台键盘控制。
+
+## 适用场景
+
+- 无人机载荷集成：机载 Jetson/工控机需要把可见光+热成像视频呈现在 QGC，同时用 RC 拨轮控制云台。
+- 机场/固定站点监控：摄像头通过 RTSP 输出，地面站仅支持 RTSP 拉流；使用本包把 ROS 图像统一转换为 RTSP 供展示。
+- 算法验证与演示：YOLO/视觉算法产出的叠加图像（如 /yolov8/detection_image）可作为第三路 RTSP 输出给 QGC/VLC。
+- 实验室/调试：快速验证 RTSP 地址、网络连通、RC 通道映射与云台指令链路。
+
+不适用或注意事项：
+- 本包不是摄像头驱动，RTSP 流必须由相机或外部工具提供；USB 摄像头可用 usb_cam 发布为话题，再用本包 RTSP 服务推流。
+- 默认使用 CPU x264 编码，Jetson 上高分辨率多路推流可能存在负载压力；可按需扩展为硬件编码器（如 nvv4l2h264enc）。
+- QGC/手机需与 Jetson 处于同一可互访网络（Wi‑Fi/热点/以太网），蓝牙链路不承载 IP 视频。
+
 本包提供如下功能：
 - RTSP 实时视频拉流并发布为 ROS 图像话题（单路/双路）。
 - 将 ROS 图像话题再推送为 RTSP 服务，便于 QGC/地面站/播放器取流。
